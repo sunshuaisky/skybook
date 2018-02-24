@@ -6,7 +6,7 @@
 		</div>
 		<div class="Clist">
 			<ul>
-				<li v-for="list in Clist" @click="goChapter(list.cid)">
+				<li v-for="list in Clist" @click="goChapter(list.nums)">
 						{{ list.chapter }}
 				</li>
 			</ul>
@@ -30,10 +30,10 @@
 			hideListPanel() {
 				this.$store.state.list_panel = false
 			},
-			goChapter(cid){
+			goChapter(nums){
 				this.hideListPanel();
 				this.$store.state.readbar = false;
-				this.$store.state.curChapter = cid;
+				this.$store.state.curChapter = nums;
 			}
 		},
 	    computed: mapState([

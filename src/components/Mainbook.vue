@@ -18,7 +18,7 @@
 			<p>{{ book.main }}</p>
 		</div>
 		<div class="read">
-			<router-link :to="'/read/' + bid + '/' + cid">
+			<router-link :to="'/read/' + bid">
 				<mt-button type="danger" size="large">
 					开始阅读
 				</mt-button>

@@ -6,6 +6,10 @@
 			<div>
 				<p v-for="p in content">{{ p }}</p>
 			</div>
+			<div class="jump">
+				<div class="prev" @click="prev(curChapter)">上一章</div>
+				<div class="next" @click="next(curChapter)">下一章</div>
+			</div>
 		</div>
 		<Cover :class="{hide:!list_panel}"></Cover>
 		<Clist :class="{show:list_panel}"></Clist>
@@ -54,20 +58,20 @@
 			this.bookid = this.$route.params.bid;
 			if (localBookReaderInfo && localBookReaderInfo[id]) {
 				this.booksReadInfo = localEvent.StorageGetter('bookreaderinfo');
-		        this.fetchchapter(this.booksReadInfo[id].chapter);
-		        this.$store.state.curChapter = this.booksReadInfo[id].chapter;
+		        this.fetchchapter(id, this.booksReadInfo[id].nums);
+		        this.$store.state.curChapter = this.booksReadInfo[id].nums;
 			} else {
 				if (localBookReaderInfo) {
 					this.booksReadInfo = localBookReaderInfo;
-			        this.fetchchapter(this.$route.params.cid);
-			        this.$store.state.curChapter = this.$route.params.cid;
+			        this.fetchchapter(id, 1);
+			        this.$store.state.curChapter = 1;
 				} else {
 				    this.booksReadInfo[id] = {
 					    book: id,
-				    	chapter: this.$route.params.cid
+				    	nums: 1
 					}
-			        this.fetchchapter(this.$route.params.cid);
-			        this.$store.state.curChapter = this.$route.params.cid;
+			        this.fetchchapter(id, 1);
+			        this.$store.state.curChapter = 1;
 				}
 			}
 	    },
@@ -76,15 +80,16 @@
 	    	this.fetchClist(this.$route.params.bid);
 	    },
 	    methods: {
-	    	fetchchapter: async function(cid){
+	    	fetchchapter: async function(bid,nums){
 	    		let url = this.api.bookchapter;
 	    		let params = {
-			        cid: cid
+			        bid: bid,
+			        nums: nums
 			    }
 			    document.body.scrollTop = 0;
 				document.documentElement.scrollTop = 0;
 			    const res = await this.$http.get(url, params);
-		        this.$store.state.curChapter = cid;
+		        this.$store.state.curChapter = nums;
 			    this.title = res.data.chapter.title;
 			    this.chapter = res.data.chapter.chapter;
 			    this.content = res.data.chapter.content.split('<br><br>');
@@ -93,11 +98,10 @@
 		        this.$store.dispatch('toggleBar');
         		this.$store.state.font_panel = false;
 		    },
-	        saveBooksInfo() {
-		        let cid = this.curChapter;
+	        saveBooksInfo(nums) {
 		        this.booksReadInfo[this.bookid] = {
-	        		book: this.$route.params.bid,
-	        		chapter: cid
+	        		book: this.bookid,
+	        		nums: nums
 		        }
 		        localEvent.StorageSetter('bookreaderinfo', this.booksReadInfo);
 	    	},
@@ -109,6 +113,12 @@
 			    const res = await this.$http.get(url, params);
 			    this.$store.state.Clist = res.data.chapter;
 	    	},
+	    	prev: function(curChapter){
+	    		this.$store.state.curChapter = curChapter - 1;
+	    	},
+	    	next: function(curChapter){
+	    		this.$store.state.curChapter = curChapter + 1;
+	    	}
 	    },
 	    computed: mapState([
 			'bg_night','fz_size','font_panel','bg_color','list_panel', 'curChapter'
@@ -119,8 +129,8 @@
 		        localEvent.StorageSetter('fz_size', val);
 			},
 			curChapter(val){
-				this.fetchchapter(val);
-				this.saveBooksInfo();
+				this.fetchchapter(this.bookid, val);
+				this.saveBooksInfo(val);
 			}
 		}
 	}
@@ -133,7 +143,7 @@
 	.content{
 		background-color: #e9dfc7;
 		padding: 15px;
-		height: 100%;
+		min-height: 100%;
 		color: #555;
 	}
 	.content[night="true"]{
@@ -167,5 +177,23 @@
 	    left: 50px;
 	    bottom: 100px;
 	    right: 50px;
+	}
+	.jump{
+		width: 100%;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		display: flex;
+	    align-items: center;
+    	justify-content: space-around;
+		.prev, .next{
+			width: 40%;
+			height: 30px;
+			background-color: #555555;
+			color: #ffffff;
+			font-size: 16px;
+			border-radius: 5px;
+			text-align: center;
+			line-height: 30px;
+		}
 	}
 </style>

@@ -21,7 +21,7 @@ export default new Router({
 		name: 'Booklist',
 		component: Booklist
 	}, {
-		path: '/read/:bid/:cid',
+		path: '/read/:bid',
 		name: 'Read',
 		component: Read
 	}]
