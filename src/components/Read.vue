@@ -77,7 +77,6 @@
 	    },
 	    mounted(){
 	    	this.$refs.fz_size.style.fontSize = this.fz_size + 'px';
-	    	this.fetchClist(this.$route.params.bid);
 	    },
 	    methods: {
 	    	fetchchapter: async function(bid,nums){
@@ -89,10 +88,12 @@
 			    document.body.scrollTop = 0;
 				document.documentElement.scrollTop = 0;
 			    const res = await this.$http.get(url, params);
+			    console.log(res)
 		        this.$store.state.curChapter = nums;
-			    this.title = res.data.chapter.title;
-			    this.chapter = res.data.chapter.chapter;
-			    this.content = res.data.chapter.content.split('<br><br>');
+			    this.title = res.data.content.title;
+			    this.chapter = res.data.content.chapter;
+			    this.content = res.data.content.content.split('<br><br>');
+			    this.$store.state.Clist = res.data.chapter;
 	    	},
 	    	clickBar() {
 		        this.$store.dispatch('toggleBar');
@@ -104,14 +105,6 @@
 	        		nums: nums
 		        }
 		        localEvent.StorageSetter('bookreaderinfo', this.booksReadInfo);
-	    	},
-			fetchClist: async function(bid){
-	    		let url = this.api.Clist;
-	    		let params = {
-			        bid: bid
-			    }
-			    const res = await this.$http.get(url, params);
-			    this.$store.state.Clist = res.data.chapter;
 	    	},
 	    	prev: function(curChapter){
 	    		this.$store.state.curChapter = curChapter - 1;
